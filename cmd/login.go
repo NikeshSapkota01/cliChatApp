@@ -55,6 +55,10 @@ var loginCmd = &cobra.Command{
 			break
 		}
 
+		if user != nil {
+			isLoggedIn = true
+		}
+
 		// Your code to create a new Login goes here
 	},
 }

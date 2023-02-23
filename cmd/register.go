@@ -10,12 +10,6 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 )
 
-var (
-	username string
-	email    string
-	password string
-)
-
 var registerCmd = &cobra.Command{
 	Use:   "service",
 	Short: "Create a new service",
