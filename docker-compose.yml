@@ -1,0 +1,33 @@
+version: "3.8"
+
+services:
+  api:
+    container_name: chatApi
+    build: .
+    ports:
+      - 8080:8080
+    environment:
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=root
+      - DB_NAME=chatApi
+      - DB_PORT=5432
+      - HOST=localhost
+    depends_on:
+      - database
+
+  database:
+    container_name: goCliChat
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=root 
+      - POSTGRES_DB=chatApi
+      - POSTGRES_PORT=5432
+    ports:
+      - 5440:5432
+    volumes:
+      - db:/var/lib/postgresql/data5
+
+volumes:
+  db:
