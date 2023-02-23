@@ -8,7 +8,6 @@ import (
 )
 
 func main() {
-	cmd.Execute()
 
 	_, err := db.NewDatabase()
 
@@ -17,4 +16,6 @@ func main() {
 	}
 
 	log.Printf("Connected to DB ...")
+
+	cmd.Execute()
 }
