@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/NikeshSapkota01/cliChatApp/db"
+	"github.com/NikeshSapkota01/cliChatApp/pkg/user"
 	"github.com/spf13/cobra"
 	"golang.org/x/crypto/ssh/terminal"
 )
@@ -43,8 +45,21 @@ var registerCmd = &cobra.Command{
 			break
 		}
 
+		// create a new user in the database
+		db, err := db.NewDatabase()
+		if err != nil {
+			fmt.Printf("Failed to connect to database: %v\n", err)
+			return
+		}
+		defer db.Close()
+		if err := user.CreateUser(db, username, email, password); err != nil {
+			fmt.Printf("Failed to create user: %v\n", err)
+			return
+		}
+
 		for {
-			fmt.Println("Trying to login into the system...")
+			fmt.Println("Created user with...")
+
 			fmt.Printf("Username: %s\n", username)
 			fmt.Printf("Email: %s\n", email)
 			fmt.Printf("Password: %s\n", strings.Repeat("*", len(password)))
