@@ -1,0 +1,7 @@
+CREATE TABLE chats (
+  id UUID PRIMARY KEY,
+  message VARCHAR,
+  user_id UUID NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT chats_user_id_fk FOREIGN KEY (user_id) REFERENCES users(id)
+);

@@ -1,0 +1,3 @@
+ALTER TABLE chats DROP FOREIGN KEY chats_user_id_fk;
+
+DROP TABLE IF EXISTS chats;
