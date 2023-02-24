@@ -62,6 +62,7 @@ var (
 
 			if isLoggedIn {
 				fmt.Println("Chat app will now begin...")
+				socketCmd.Run(cmd, args)
 
 			}
 		},
