@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/NikeshSapkota01/cliChatApp/db"
 	"github.com/NikeshSapkota01/cliChatApp/pkg/user"
@@ -14,6 +13,7 @@ var (
 	username string
 	email    string
 	password string
+	userId   string
 )
 
 var loginCmd = &cobra.Command{
@@ -61,13 +61,12 @@ var loginCmd = &cobra.Command{
 		}
 
 		for {
-			fmt.Println("Trying to login into the system...")
-			fmt.Printf("Email: %s\n", user)
-			fmt.Printf("Password: %s\n", strings.Repeat("*", len(password)))
+			fmt.Printf("User with email %s logged in successfully\n", user.Username)
 			break
 		}
 
 		if user != nil {
+			userId = user.Id
 			isLoggedIn = true
 		}
 	},

@@ -8,6 +8,9 @@ import (
 	"os"
 	"strings"
 
+	"github.com/NikeshSapkota01/cliChatApp/db"
+	"github.com/NikeshSapkota01/cliChatApp/pkg/user"
+
 	socketio_client "github.com/zhouhui8915/go-socket.io-client"
 
 	"github.com/spf13/cobra"
@@ -25,6 +28,30 @@ var (
 
 func connectSocketIO(namespace string) {
 
+	db, err := db.NewDatabase()
+
+	if err != nil {
+		fmt.Printf("Failed to connect to database: %v\n", err)
+		return
+	}
+	defer db.Close()
+
+	green := "\033[32m"
+	reset := "\033[0m"
+	blue := "\033[34m"
+
+	chats, err := user.GetAllChats(db)
+
+	if err != nil {
+		fmt.Printf("Failed to get chat: %v\n", err)
+	}
+
+	// Print all chats
+	for _, chat := range chats {
+
+		fmt.Printf("%sfrom: %s  message: %s%s\n", blue, chat.User, chat.Message, reset)
+	}
+
 	opts := &socketio_client.Options{
 		Transport: "websocket",
 		Query:     make(map[string]string),
@@ -40,9 +67,6 @@ func connectSocketIO(namespace string) {
 	}
 
 	client.On("reply", func(msg string) {
-
-		green := "\033[32m"
-		reset := "\033[0m"
 
 		log.Printf("%s\nMessage: %s%s", green, msg, reset)
 	})
@@ -60,7 +84,9 @@ func connectSocketIO(namespace string) {
 		message = strings.TrimSuffix(message, "\n")
 
 		usermail := &username
-		messageInfo := []string{*usermail, message}
+		user_id := &userId
+
+		messageInfo := []string{*user_id, *usermail, message}
 		parshedMessage, _ := json.Marshal(messageInfo)
 		client.Emit("notice", string(parshedMessage))
 	}
