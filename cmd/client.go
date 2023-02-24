@@ -19,22 +19,21 @@ func connectSocketIO(namespace string) {
 
 	opts := &socketio_client.Options{
 		Transport: "websocket",
+		Query:     make(map[string]string),
 	}
-	client, err := socketio_client.NewClient(fmt.Sprintf("http://localhost:5000/%s", namespace), opts)
+	opts.Query["user"] = "user"
+	opts.Query["pwd"] = "pass"
+	uri := "http://localhost:5000/socket.io/"
+
+	client, err := socketio_client.NewClient(uri, opts)
 
 	if err != nil {
 		log.Fatalf("Failed to connect to WebSocket server: %v", err)
 	}
 
-	client.On("connect", func() {
-		log.Printf("Connected to WebSocket namespace %s", namespace)
-	})
+	log.Print(namespace, client, "this is a namespce")
 
-	client.On("disconnection", func() {
-		log.Printf("Disconnected from WebSocket namespace %s", namespace)
-	})
-
-	client.On("message", func(msg string) {
+	client.On("reply", func(msg string) {
 		log.Printf("Received message from WebSocket namespace %s: %s", namespace, msg)
 	})
 
@@ -43,17 +42,19 @@ func connectSocketIO(namespace string) {
 		return
 	}
 
-	// Send a message to all connected clients
-	if err := client.Emit("message", "Hello, World!"); err != nil {
-		log.Printf("Failed to send message to WebSocket namespace %s: %v", namespace, err)
-		return
+	for {
+		fmt.Print("Enter message: ")
+		fmt.Scanln(&message)
+		client.Emit("notice", message)
 	}
+
 }
 
 func runWebSocketCLI(cmd *cobra.Command, args []string) {
 	for _, namespace := range namespaces {
 		connectSocketIO(namespace)
 	}
+
 	select {}
 }
 

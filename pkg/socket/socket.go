@@ -19,7 +19,7 @@ func main() {
 
 	server.OnEvent("/", "notice", func(s socketio.Conn, msg string) {
 		fmt.Println("notice:", msg)
-		s.Emit("reply", "have "+msg)
+		s.Emit("reply", "from "+msg)
 	})
 
 	server.OnEvent("/chat", "msg", func(s socketio.Conn, msg string) string {
