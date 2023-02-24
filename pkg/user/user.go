@@ -11,6 +11,7 @@ import (
 )
 
 type User struct {
+	Id       string
 	Username string
 	Password string
 }
@@ -24,7 +25,9 @@ func CreateUser(db *db.Database, username string, email string, password string)
 		return err
 	}
 
-	_, err = db.GetDB().Exec("INSERT INTO users (id, username, email, hashed_password) VALUES ($1, $2, $3, $4)", id, username, email, hashed_pass)
+	query := "INSERT INTO users (id, username, email, hashed_password) VALUES ($1, $2, $3, $4)"
+	_, err = db.GetDB().Exec(query, id, username, email, hashed_pass)
+
 	if err != nil {
 		return fmt.Errorf("failed to insert user into database: %v", err)
 	}
@@ -34,12 +37,12 @@ func CreateUser(db *db.Database, username string, email string, password string)
 	return nil
 }
 
-func IdentifyUser(db *db.Database, email string, password string) (*User, error) {
+func IdentifyUser(db *db.Database, username string, password string) (*User, error) {
 	var user User
 
-	query := "SELECT username, hashed_password FROM users WHERE email=$1"
+	query := "SELECT id, username, hashed_password FROM users WHERE username=$1"
+	err := db.GetDB().QueryRow(query, username).Scan(&user.Id, &user.Username, &user.Password)
 
-	err := db.GetDB().QueryRow(query, email).Scan(&user.Username, &user.Password)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, fmt.Errorf("user not found")

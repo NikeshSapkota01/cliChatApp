@@ -6,13 +6,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	username   string
-	email      string
-	password   string
-	isLoggedIn bool
-	message    string
-)
+var isLoggedIn bool
 
 var (
 	// Used for flags.
@@ -25,6 +19,12 @@ var (
 		Long:  `Create a CLI chat application using golang.`,
 
 		Run: func(cmd *cobra.Command, args []string) {
+			if isLoggedIn {
+				fmt.Println("Chat app will now begin...")
+
+				socketCmd.Run(cmd, args)
+			}
+
 			for {
 
 				if isLoggedIn {
@@ -37,16 +37,19 @@ var (
 					fmt.Println("1: Login")
 					fmt.Println("2: Register")
 					fmt.Print("Enter your choice: ")
+
 					if _, err := fmt.Scanln(&choice); err != nil {
 						fmt.Println("Invalid input. Please enter a number.")
 						continue
 					}
+
 					if choice != 1 && choice != 2 {
 						fmt.Println("Invalid choice. Please enter 1 or 2.")
 						continue
 					}
 					break
 				}
+
 				if choice == 1 {
 					fmt.Println("Login process will now begin...")
 
@@ -57,16 +60,6 @@ var (
 					registerCmd.Run(cmd, args)
 				}
 			}
-
-			if isLoggedIn {
-				fmt.Println("Chat app will now begin...")
-
-				socketCmd.Run(cmd, args)
-			}
-
-			username = ""
-			email = ""
-			password = ""
 
 		},
 	}

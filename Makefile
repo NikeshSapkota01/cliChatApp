@@ -23,6 +23,6 @@ migrateup:
 	migrate -path db/migrations -database "postgresql://postgres:root@localhost:5440/chatApi?sslmode=disable" -verbose up
 
 migratedown:
-	migrate -path db/migrations -database "postgresql://postgres:root@localhost:5433/chatApi?sslmode=disable" -verbose down
+	migrate -path db/migrations -database "postgresql://postgres:root@localhost:5440/chatApi?sslmode=disable" -verbose down
 
 .PHONY: docker/image docker/run docker/stop docker/start postgres createdb dropdb migrateup migratedown

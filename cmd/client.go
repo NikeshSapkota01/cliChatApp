@@ -19,6 +19,10 @@ var (
 	namespaces []string
 )
 
+var (
+	message string
+)
+
 func connectSocketIO(namespace string) {
 
 	opts := &socketio_client.Options{
@@ -40,7 +44,7 @@ func connectSocketIO(namespace string) {
 		green := "\033[32m"
 		reset := "\033[0m"
 
-		log.Printf("%s\nMessage %s: %s%s", green, namespace, msg, reset)
+		log.Printf("%s\nMessage: %s%s", green, msg, reset)
 	})
 
 	if err != nil {
@@ -55,11 +59,10 @@ func connectSocketIO(namespace string) {
 		message, _ = reader.ReadString('\n')
 		message = strings.TrimSuffix(message, "\n")
 
-		usermail := &email
-		slcD := []string{*usermail, message}
-		slcB, _ := json.Marshal(slcD)
-		log.Println(string(slcB), "parsjed")
-		client.Emit("notice", string(slcB))
+		usermail := &username
+		messageInfo := []string{*usermail, message}
+		parshedMessage, _ := json.Marshal(messageInfo)
+		client.Emit("notice", string(parshedMessage))
 	}
 }
 

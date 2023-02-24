@@ -10,17 +10,28 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 )
 
+var (
+	username string
+	email    string
+	password string
+)
+
 var loginCmd = &cobra.Command{
 	Use:   "Login",
 	Short: "Create a new Login",
 	Run: func(cmd *cobra.Command, args []string) {
+		username = ""
+		email = ""
+		password = ""
 
 		for {
-			if email == "" {
-				fmt.Print("Enter email: ")
-				fmt.Scanln(&email)
+
+			if username == "" {
+				fmt.Print("Enter username: ")
+				fmt.Scanln(&username)
 				continue
 			}
+
 			if password == "" {
 				fmt.Print("Enter password: ")
 				passwordBytes, err := terminal.ReadPassword(0)
@@ -36,12 +47,13 @@ var loginCmd = &cobra.Command{
 		}
 
 		db, err := db.NewDatabase()
+
 		if err != nil {
 			fmt.Printf("Failed to connect to database: %v\n", err)
 			return
 		}
 		defer db.Close()
-		user, err := user.IdentifyUser(db, email, password)
+		user, err := user.IdentifyUser(db, username, password)
 
 		if err != nil {
 			fmt.Printf("Failed to create user: %v\n", err)
@@ -58,8 +70,6 @@ var loginCmd = &cobra.Command{
 		if user != nil {
 			isLoggedIn = true
 		}
-
-		// Your code to create a new Login goes here
 	},
 }
 
