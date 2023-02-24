@@ -19,13 +19,14 @@ func main() {
 		numClients++
 
 		fmt.Println("connected:", numClients)
+		s.Join("bcast")
 
 		return nil
 	})
 
 	server.OnEvent("/", "notice", func(s socketio.Conn, msg string) {
 		fmt.Println("notice:", msg)
-		s.Emit("reply", "have "+msg)
+		server.BroadcastToRoom("/", "bcast", "reply", msg)
 	})
 
 	server.OnError("/", func(s socketio.Conn, e error) {

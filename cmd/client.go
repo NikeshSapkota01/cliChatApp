@@ -47,7 +47,6 @@ func connectSocketIO(namespace string) {
 		fmt.Scanln(&message)
 		client.Emit("notice", message)
 	}
-
 }
 
 func runWebSocketCLI(cmd *cobra.Command, args []string) {
