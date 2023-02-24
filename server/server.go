@@ -13,6 +13,11 @@ var numClients int
 func main() {
 	server := socketio.NewServer(nil)
 
+	type Database struct {
+		emailName string
+		message   string
+	}
+
 	server.OnConnect("/", func(s socketio.Conn) error {
 		s.SetContext("")
 		// fmt.Println("connected:", s.ID())
@@ -25,7 +30,7 @@ func main() {
 	})
 
 	server.OnEvent("/", "notice", func(s socketio.Conn, msg string) {
-		fmt.Println("notice:", msg)
+		fmt.Println("msg:", msg)
 		server.BroadcastToRoom("/", "bcast", "reply", msg)
 	})
 

@@ -1,8 +1,12 @@
 package cmd
 
 import (
+	"bufio"
+	"encoding/json"
 	"fmt"
 	"log"
+	"os"
+	"strings"
 
 	socketio_client "github.com/zhouhui8915/go-socket.io-client"
 
@@ -31,10 +35,12 @@ func connectSocketIO(namespace string) {
 		log.Fatalf("Failed to connect to WebSocket server: %v", err)
 	}
 
-	log.Print(namespace, client, "this is a namespce")
-
 	client.On("reply", func(msg string) {
-		log.Printf("Received message from WebSocket namespace %s: %s", namespace, msg)
+
+		green := "\033[32m"
+		reset := "\033[0m"
+
+		log.Printf("%s\nMessage %s: %s%s", green, namespace, msg, reset)
 	})
 
 	if err != nil {
@@ -43,13 +49,22 @@ func connectSocketIO(namespace string) {
 	}
 
 	for {
+
 		fmt.Print("Enter message: ")
-		fmt.Scanln(&message)
-		client.Emit("notice", message)
+		reader := bufio.NewReader(os.Stdin)
+		message, _ = reader.ReadString('\n')
+		message = strings.TrimSuffix(message, "\n")
+
+		usermail := &email
+		slcD := []string{*usermail, message}
+		slcB, _ := json.Marshal(slcD)
+		log.Println(string(slcB), "parsjed")
+		client.Emit("notice", string(slcB))
 	}
 }
 
 func runWebSocketCLI(cmd *cobra.Command, args []string) {
+
 	for _, namespace := range namespaces {
 		connectSocketIO(namespace)
 	}
@@ -71,6 +86,7 @@ func init() {
 	socketCmd.Flags().StringSliceVarP(&namespaces, "namespace", "n", []string{"/"}, "Socket.IO namespaces to connect to")
 
 	rootCmd.AddCommand(socketCmd)
+
 	if err := rootCmd.Execute(); err != nil {
 		log.Fatal(err)
 	}
