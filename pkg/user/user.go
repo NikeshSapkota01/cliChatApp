@@ -7,31 +7,21 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/NikeshSapkota01/cliChatApp/db"
+	"github.com/NikeshSapkota01/cliChatApp/mystructs"
 	"github.com/NikeshSapkota01/cliChatApp/util"
 )
 
-type User struct {
-	Id       string
-	Username string
-	Password string
-}
-
-type Chat struct {
-	User    string `json:"username"`
-	Message string `json:"message"`
-}
-
-func CreateUser(db *db.Database, username string, email string, password string) error {
+func CreateUser(db *db.Database, u mystructs.UserInfo) error {
 	id := uuid.New()
 
-	hashed_pass, err := util.HashPassword(password)
+	hashed_pass, err := util.HashPassword(u.Password)
 
 	if err != nil {
 		return err
 	}
 
 	query := "INSERT INTO users (id, username, email, hashed_password) VALUES ($1, $2, $3, $4)"
-	_, err = db.GetDB().Exec(query, id, username, email, hashed_pass)
+	_, err = db.GetDB().Exec(query, id, u.Username, u.Email, hashed_pass)
 
 	if err != nil {
 		return fmt.Errorf("failed to insert user into database: %v", err)
@@ -42,8 +32,8 @@ func CreateUser(db *db.Database, username string, email string, password string)
 	return nil
 }
 
-func IdentifyUser(db *db.Database, username string, password string) (*User, error) {
-	var user User
+func IdentifyUser(db *db.Database, username string, password string) (*mystructs.User, error) {
+	var user mystructs.User
 
 	query := "SELECT id, username, hashed_password FROM users WHERE username=$1"
 	err := db.GetDB().QueryRow(query, username).Scan(&user.Id, &user.Username, &user.Password)
@@ -80,29 +70,8 @@ func UserChats(db *db.Database, userId string, message string) error {
 	return nil
 }
 
-func GetAllChat(db *db.Database) (*Chat, error) {
-
-	var chat Chat
-
-	query := "SELECT users.email, chats.message	FROM chats JOIN users ON chats.user_id = users.id"
-	err := db.GetDB().QueryRow(query).Scan(&chat.Message, &chat.User)
-
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, fmt.Errorf("chat not found")
-		}
-		return nil, fmt.Errorf("failed to get chat: %v", err)
-	}
-
-	fmt.Printf("chat information %v/n", chat)
-
-	fmt.Println("Chat added successfully...")
-	return &chat, nil
-
-}
-
-func GetAllChats(db *db.Database) ([]Chat, error) {
-	var chats []Chat
+func GetAllChats(db *db.Database) ([]mystructs.Chat, error) {
+	var chats []mystructs.Chat
 
 	query := "SELECT users.username, chats.message FROM chats JOIN users ON chats.user_id = users.id"
 	rows, err := db.GetDB().Query(query)
@@ -113,7 +82,7 @@ func GetAllChats(db *db.Database) ([]Chat, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var chat Chat
+		var chat mystructs.Chat
 		if err := rows.Scan(&chat.User, &chat.Message); err != nil {
 			return nil, fmt.Errorf("failed to scan chat: %v", err)
 		}

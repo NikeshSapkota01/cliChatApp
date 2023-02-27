@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/NikeshSapkota01/cliChatApp/db"
+	"github.com/NikeshSapkota01/cliChatApp/mystructs"
 	"github.com/NikeshSapkota01/cliChatApp/pkg/user"
 	"github.com/spf13/cobra"
 	"golang.org/x/crypto/ssh/terminal"
@@ -54,7 +55,9 @@ var registerCmd = &cobra.Command{
 
 		defer db.Close()
 
-		if err := user.CreateUser(db, username, email, password); err != nil {
+		UserInfo := mystructs.UserInfo{Username: username, Email: email, Password: password}
+
+		if err := user.CreateUser(db, UserInfo); err != nil {
 			fmt.Printf("Failed to create user: %v\n", err)
 			return
 		}
